@@ -200,7 +200,7 @@ VITE_APP_BASE_URL=/
    git add .
    git commit -m "Initial commit"
    git branch -M main
-   git remote add origin https://github.com/yinchengwan/clock.git
+   git remote add origin https://github.com/xzngycw/clock.git
    git push -u origin main
    ```
 
@@ -210,7 +210,7 @@ VITE_APP_BASE_URL=/
    - 推送代码后会自动触发部署
 
 3. **访问应用**
-   - 部署完成后访问：`https://yinchengwan.github.io/clock/`
+   - 部署完成后访问：`https://xzngycw.github.io/clock/`
 
 **自动部署已配置**：每次推送到 `main` 或 `master` 分支，GitHub Actions 会自动构建并部署。
 
