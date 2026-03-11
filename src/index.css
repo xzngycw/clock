@@ -1,0 +1,335 @@
+/* 导入有趣的字体 */
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS 变量定义 - 卡通马卡龙色系 */
+:root {
+  --color-primary: #FF9B9B; /* 柔和粉红 */
+  --color-primary-light: #FFB4B4;
+  --color-primary-dark: #FF6B6B;
+  --color-secondary: #FFD93D; /* 活泼橙黄 */
+  --color-accent: #6BCB77; /* 清新薄荷绿 */
+  --color-error: #FF6B6B;
+  --color-success: #4D96FF; /* 活泼蓝 */
+  
+  /* 背景渐变 - 更柔和甜美 */
+  --bg-gradient: linear-gradient(135deg, #FFF0F5 0%, #E6E6FA 50%, #F0F8FF 100%);
+  --bg-card: rgba(255, 255, 255, 0.95);
+  
+  /* 阴影 - 更大更柔和，像云朵 */
+  --shadow-soft: 0 8px 30px rgba(255, 155, 155, 0.2);
+  --shadow-float: 0 15px 40px rgba(255, 155, 155, 0.3);
+}
+
+/* 基础样式 */
+@layer base {
+  html {
+    font-family: 'Nunito', sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply text-base-content;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* 背景装饰 */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  /* 显示字体 */
+  .font-display {
+    font-family: 'ZCOOL KuaiLe', cursive;
+    letter-spacing: 0.02em;
+  }
+  
+  /* 标题样式 */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'ZCOOL KuaiLe', cursive;
+  }
+}
+
+/* 组件样式 */
+@layer components {
+  /* 安全区域底部内边距（适配 iPhone 等） */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* 卡片样式 - 更圆润、有阴影 */
+  .card-fun {
+    @apply relative bg-white rounded-[2rem] p-6;
+    box-shadow: var(--shadow-soft), inset 0 -4px 0 rgba(0,0,0,0.05);
+    backdrop-filter: blur(10px);
+    border: 3px solid white;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .card-fun:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--shadow-float), inset 0 -4px 0 rgba(0,0,0,0.05);
+  }
+  
+  /* 按钮样式 - 更圆润、有弹性 */
+  .btn-fun {
+    @apply relative font-bold rounded-full px-6 py-3 border-b-4 active:border-b-0 active:translate-y-1;
+    transition: all 0.15s ease;
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+  }
+  
+  .btn-fun::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  
+  /* 主按钮 */
+  .btn-primary-fun {
+    @apply btn-fun border-primary-dark;
+    background: var(--color-primary);
+    color: white;
+  }
+  
+  .btn-primary-fun:hover {
+    background: var(--color-primary-light);
+  }
+  
+  /* 次要按钮 */
+  .btn-secondary-fun {
+    @apply btn-fun border-orange-400;
+    background: var(--color-secondary);
+    color: #4A4A4A;
+  }
+  
+  /* 成功按钮 */
+  .btn-success-fun {
+    @apply btn-fun border-green-600;
+    background: var(--color-accent);
+    color: white;
+  }
+  
+  /* 浮动装饰元素 */
+  .float-decoration {
+    position: absolute;
+    opacity: 0.6;
+    animation: float 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  /* 渐变文字 */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* 彩虹边框 */
+  .rainbow-border {
+    position: relative;
+  }
+  
+  .rainbow-border::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, 
+      var(--color-primary), 
+      var(--color-secondary), 
+      var(--color-accent), 
+      var(--color-primary)
+    );
+    background-size: 300% 300%;
+    animation: rainbow 4s linear infinite;
+    z-index: -1;
+  }
+  
+  /* 星星装饰 */
+  .star-decoration {
+    position: absolute;
+    color: var(--color-secondary);
+    animation: twinkle 1.5s ease-in-out infinite;
+  }
+  
+  /* 云朵装饰 */
+  .cloud-decoration {
+    position: absolute;
+    opacity: 0.3;
+    animation: drift 20s linear infinite;
+  }
+}
+
+/* 工具类 */
+@layer utilities {
+  /* 文字阴影 */
+  .text-shadow-fun {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 弹性动画 */
+  .bounce-in {
+    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  /* 隐藏滚动条 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* 触摸操作优化 */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* 渐变背景 */
+  .bg-fun {
+    background: var(--bg-gradient);
+  }
+}
+
+/* 动画关键帧 */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes drift {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out infinite;
+}
+
+.animate-pop {
+  animation: pop 0.3s ease-in-out;
+}
+
+/* 主题相关样式 */
+[data-theme="light"] {
+  --clock-face: #FFFFFF;
+  --hour-hand: #1F2937;
+  --minute-hand: #6366F1;
+  --second-hand: #EF4444;
+  
+  --bg-gradient: linear-gradient(135deg, #EEF2FF 0%, #FDF4FF 50%, #FFF7ED 100%);
+}
+
+[data-theme="eyecare"] {
+  --clock-face: #FFFBEB;
+  --hour-hand: #78350F;
+  --minute-hand: #7C3AED;
+  --second-hand: #DC2626;
+  
+  --bg-gradient: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 50%, #FDE68A 100%);
+}
+
+[data-theme="dark"] {
+  --clock-face: #1F2937;
+  --hour-hand: #F3F4F6;
+  --minute-hand: #818CF8;
+  --second-hand: #F87171;
+  
+  --bg-gradient: linear-gradient(135deg, #111827 0%, #1F2937 50%, #374151 100%);
+  
+  --bg-card: rgba(31, 41, 55, 0.9);
+}
+
+/* 装饰性元素 */
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+  pointer-events: none;
+}
+
+.decoration-blob {
+  position: absolute;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+  animation: morph 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes morph {
+  0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+  50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+  75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+}

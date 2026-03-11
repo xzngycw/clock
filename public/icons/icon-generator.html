@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA 图标生成器</title>
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #EEF2FF 0%, #FDF4FF 50%, #FFF7ED 100%);
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.15);
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      color: #6366F1;
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid #E5E7EB;
+      border-radius: 12px;
+      margin: 20px 0;
+      display: block;
+    }
+    button {
+      background: linear-gradient(135deg, #6366F1, #4F46E5);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px 5px;
+      transition: all 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .info {
+      background: #EEF2FF;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      color: #4F46E5;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🕐 认识时间 - PWA 图标</h1>
+    <div class="info">
+      这个工具会生成 PWA 所需的图标文件。<br>
+      点击下载按钮保存图标到 public/icons/ 目录。
+    </div>
+    <canvas id="canvas192" width="192" height="192"></canvas>
+    <canvas id="canvas512" width="512" height="512"></canvas>
+    <div class="buttons">
+      <button onclick="downloadIcon(192)">下载 192x192 图标</button>
+      <button onclick="downloadIcon(512)">下载 512x512 图标</button>
+    </div>
+  </div>
+
+  <script>
+    function drawClock(canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const center = size / 2;
+      const radius = size * 0.4;
+
+      // 清空画布
+      ctx.clearRect(0, 0, size, size);
+
+      // 绘制渐变背景
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#6366F1');
+      gradient.addColorStop(1, '#4F46E5');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+
+      // 绘制时钟表盘
+      ctx.beginPath();
+      ctx.arc(center, center, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fill();
+
+      // 绘制表盘边框
+      ctx.beginPath();
+      ctx.arc(center, center, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#F59E0B';
+      ctx.lineWidth = size * 0.02;
+      ctx.stroke();
+
+      // 绘制刻度
+      for (let i = 0; i < 12; i++) {
+        const angle = (i * 30 - 90) * Math.PI / 180;
+        const startX = center + Math.cos(angle) * radius * 0.85;
+        const startY = center + Math.sin(angle) * radius * 0.85;
+        const endX = center + Math.cos(angle) * radius * 0.95;
+        const endY = center + Math.sin(angle) * radius * 0.95;
+
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = '#1F2937';
+        ctx.lineWidth = size * 0.015;
+        ctx.stroke();
+
+        // 绘制数字
+        const numX = center + Math.cos(angle) * radius * 0.7;
+        const numY = center + Math.sin(angle) * radius * 0.7;
+        ctx.font = `bold ${size * 0.08}px Arial`;
+        ctx.fillStyle = '#1F2937';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(i === 0 ? '12' : i.toString(), numX, numY);
+      }
+
+      // 绘制中心点
+      ctx.beginPath();
+      ctx.arc(center, center, size * 0.02, 0, 2 * Math.PI);
+      ctx.fillStyle = '#EF4444';
+      ctx.fill();
+
+      // 绘制时针 (指向3点)
+      const hourAngle = (3 * 30 - 90) * Math.PI / 180;
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.lineTo(
+        center + Math.cos(hourAngle) * radius * 0.5,
+        center + Math.sin(hourAngle) * radius * 0.5
+      );
+      ctx.strokeStyle = '#1F2937';
+      ctx.lineWidth = size * 0.02;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // 绘制分针 (指向12点15分)
+      const minuteAngle = (15 * 6 - 90) * Math.PI / 180;
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.lineTo(
+        center + Math.cos(minuteAngle) * radius * 0.7,
+        center + Math.sin(minuteAngle) * radius * 0.7
+      );
+      ctx.strokeStyle = '#6366F1';
+      ctx.lineWidth = size * 0.015;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+
+    // 绘制两个尺寸的图标
+    drawClock(document.getElementById('canvas192'));
+    drawClock(document.getElementById('canvas512'));
+
+    function downloadIcon(size) {
+      const canvas = document.getElementById(`canvas${size}`);
+      const link = document.createElement('a');
+      link.download = `icon-${size}x${size}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
