@@ -38,8 +38,8 @@ export function AnalogClock({
   onTimeChange,
 }: AnalogClockProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const hourHandRef = useRef<SVGLineElement>(null);
-  const minuteHandRef = useRef<SVGLineElement>(null);
+  const hourHandGroupRef = useRef<SVGGElement>(null);
+  const minuteHandGroupRef = useRef<SVGGElement>(null);
   const secondHandRef = useRef<SVGLineElement>(null);
   const timeRef = useRef<ClockTime>(time);
   
@@ -49,13 +49,13 @@ export function AnalogClock({
   const startAngleRef = useRef(0);
   const initialHandAngleRef = useRef(0);
   
-  // 当前指针角度（用于非拖拽状态下的动画）
+  // 当前指针角度
   const handAnglesRef = useRef({ hour: 0, minute: 0, second: 0 });
 
   const center = size / 2;
   const radius = size / 2 - 10;
 
-  // 计算角度：从中心点到指定点的角度（以12点方向为0度，顺时针为正）
+  // 计算角度
   const getAngleFromCenter = useCallback(
     (clientX: number, clientY: number): number => {
       if (!svgRef.current) return 0;
@@ -67,7 +67,6 @@ export function AnalogClock({
       const dx = clientX - svgCenterX;
       const dy = clientY - svgCenterY;
 
-      // 计算角度（以12点方向为0度，顺时针为正）
       let angle = Math.atan2(dx, -dy) * (180 / Math.PI);
       if (angle < 0) angle += 360;
 
@@ -76,17 +75,16 @@ export function AnalogClock({
     []
   );
 
-  // 磁吸函数：将角度吸附到最近的刻度
+  // 磁吸函数
   const snapAngle = useCallback((angle: number, step: number): number => {
     const normalized = ((angle % 360) + 360) % 360;
     return Math.round(normalized / step) * step;
   }, []);
 
-  // 设置指针旋转角度（使用 CSS transform）
+  // 设置指针旋转角度
   const setHandRotation = useCallback((hand: 'hour' | 'minute' | 'second', angle: number) => {
-    const ref = hand === 'hour' ? hourHandRef : hand === 'minute' ? minuteHandRef : secondHandRef;
+    const ref = hand === 'hour' ? hourHandGroupRef : hand === 'minute' ? minuteHandGroupRef : secondHandRef;
     if (ref.current) {
-      // 使用 CSS transform，设置 transform-origin 为时钟中心
       ref.current.style.transformOrigin = `${center}px ${center}px`;
       ref.current.style.transform = `rotate(${angle}deg)`;
     }
@@ -101,28 +99,25 @@ export function AnalogClock({
   // 更新指针位置
   const updateHands = useCallback(
     (newTime: ClockTime, animate: boolean = animated) => {
-      // 拖拽中不更新
       if (isDraggingRef.current) return;
 
       let hourAngle = ClockTimeUtils.getHourAngle(newTime);
       let minuteAngle = ClockTimeUtils.getMinuteAngle(newTime);
       let secondAngle = ClockTimeUtils.getSecondAngle(newTime);
 
-      // 处理角度跳变
       const lastAngles = handAnglesRef.current;
       if (lastAngles.second > 300 && secondAngle < 60) secondAngle += 360;
       if (lastAngles.minute > 300 && minuteAngle < 60) minuteAngle += 360;
       if (lastAngles.hour > 300 && hourAngle < 60) hourAngle += 360;
 
-      // 使用 CSS transition 实现动画
       const transition = animate ? 'transform 0.3s ease-out' : 'none';
       
-      if (hourHandRef.current) {
-        hourHandRef.current.style.transition = transition;
+      if (hourHandGroupRef.current) {
+        hourHandGroupRef.current.style.transition = transition;
         setHandRotation('hour', hourAngle % 360);
       }
-      if (minuteHandRef.current) {
-        minuteHandRef.current.style.transition = transition;
+      if (minuteHandGroupRef.current) {
+        minuteHandGroupRef.current.style.transition = transition;
         setHandRotation('minute', minuteAngle % 360);
       }
       if (secondHandRef.current) {
@@ -133,7 +128,6 @@ export function AnalogClock({
     [animated, setHandRotation]
   );
 
-  // 时间变化时更新指针
   useEffect(() => {
     timeRef.current = time;
     updateHands(time);
@@ -146,11 +140,9 @@ export function AnalogClock({
     const allowHour = draggableHands?.hour ?? true;
     const allowMinute = draggableHands?.minute ?? true;
 
-    // 磁吸步长
-    const hourStep = 30; // 时针：每30度（1小时）
-    const minuteStep = 6; // 分针：每6度（1分钟）
+    const hourStep = 30;
+    const minuteStep = 6;
 
-    // 指针按下
     const handlePointerDown = (e: PointerEvent, target: 'hour' | 'minute') => {
       e.preventDefault();
       e.stopPropagation();
@@ -158,28 +150,22 @@ export function AnalogClock({
       isDraggingRef.current = true;
       dragTargetRef.current = target;
 
-      // 记录鼠标起始角度
       const mouseAngle = getAngleFromCenter(e.clientX, e.clientY);
       startAngleRef.current = mouseAngle;
-
-      // 记录指针当前角度
       initialHandAngleRef.current = getHandRotation(target);
 
       // 添加拖拽样式
-      const handRef = target === 'hour' ? hourHandRef : minuteHandRef;
-      if (handRef.current) {
-        handRef.current.style.transition = 'none'; // 禁用动画
-        handRef.current.classList.add('dragging');
+      const groupRef = target === 'hour' ? hourHandGroupRef : minuteHandGroupRef;
+      if (groupRef.current) {
+        groupRef.current.style.transition = 'none';
+        const line = groupRef.current.querySelector('line.hand-line');
+        if (line) line.classList.add('dragging');
       }
 
-      // 震动反馈
       if ('vibrate' in navigator) navigator.vibrate(10);
-
-      // 捕获指针
       (e.target as Element).setPointerCapture(e.pointerId);
     };
 
-    // 指针移动
     const handlePointerMove = (e: PointerEvent) => {
       if (!isDraggingRef.current || !dragTargetRef.current) return;
 
@@ -188,30 +174,22 @@ export function AnalogClock({
       const target = dragTargetRef.current;
       const newMouseAngle = getAngleFromCenter(e.clientX, e.clientY);
 
-      // 计算鼠标角度变化
       let deltaAngle = newMouseAngle - startAngleRef.current;
-
-      // 处理跨越0度的情况
       if (deltaAngle > 180) deltaAngle -= 360;
       if (deltaAngle < -180) deltaAngle += 360;
 
-      // 计算新的指针角度
       let newHandAngle = initialHandAngleRef.current + deltaAngle;
       newHandAngle = ((newHandAngle % 360) + 360) % 360;
 
-      // 实时磁吸：拖拽过程中就吸附到刻度
       const step = target === 'hour' ? hourStep : minuteStep;
       const snappedAngle = snapAngle(newHandAngle, step);
 
-      // 设置指针角度（吸附后的角度）
       setHandRotation(target, snappedAngle);
 
-      // 更新时间
       const value = ClockTimeUtils.fromAngle(snappedAngle, target === 'hour');
       const newTime = { ...timeRef.current };
       if (target === 'hour') {
         newTime.hours = value === 12 ? 0 : value;
-        // 时针吸附到整点时，重置分钟为 0，实现真正的"整点吸附"
         newTime.minutes = 0;
         newTime.seconds = 0;
       } else {
@@ -222,73 +200,71 @@ export function AnalogClock({
       onTimeChange?.(newTime);
     };
 
-    // 指针抬起
     const handlePointerUp = (e: PointerEvent) => {
       if (!isDraggingRef.current || !dragTargetRef.current) return;
 
       const target = dragTargetRef.current;
-      const handRef = target === 'hour' ? hourHandRef : minuteHandRef;
+      const groupRef = target === 'hour' ? hourHandGroupRef : minuteHandGroupRef;
 
-      // 移除拖拽样式，添加吸附动画
-      if (handRef.current) {
-        handRef.current.classList.remove('dragging');
-        handRef.current.classList.add('snapping');
-        setTimeout(() => {
-          if (handRef.current) {
-            handRef.current.classList.remove('snapping');
-          }
-        }, 150);
+      if (groupRef.current) {
+        const line = groupRef.current.querySelector('line.hand-line');
+        if (line) {
+          line.classList.remove('dragging');
+          line.classList.add('snapping');
+          setTimeout(() => {
+            if (line) line.classList.remove('snapping');
+          }, 150);
+        }
       }
 
-      // 震动反馈（磁吸时震动）
       if ('vibrate' in navigator) navigator.vibrate([5, 30, 5]);
 
-      // 重置状态
       isDraggingRef.current = false;
       dragTargetRef.current = null;
       startAngleRef.current = 0;
       initialHandAngleRef.current = 0;
 
-      // 释放指针捕获
       try {
         (e.target as Element).releasePointerCapture(e.pointerId);
       } catch {
-        // 忽略错误
+        // 忽略
       }
     };
 
-    // 全局鼠标抬起
     const handleGlobalPointerUp = () => {
       if (isDraggingRef.current) {
-        // 清理样式
-        if (hourHandRef.current) {
-          hourHandRef.current.classList.remove('dragging');
+        if (hourHandGroupRef.current) {
+          const line = hourHandGroupRef.current.querySelector('line.hand-line');
+          if (line) line.classList.remove('dragging');
         }
-        if (minuteHandRef.current) {
-          minuteHandRef.current.classList.remove('dragging');
+        if (minuteHandGroupRef.current) {
+          const line = minuteHandGroupRef.current.querySelector('line.hand-line');
+          if (line) line.classList.remove('dragging');
         }
         isDraggingRef.current = false;
         dragTargetRef.current = null;
       }
     };
 
-    // 添加事件监听
     const handlers: Array<{ element: Element; event: string; handler: EventListener }> = [];
 
-    if (allowHour && hourHandRef.current) {
-      const handler = (e: Event) => handlePointerDown(e as PointerEvent, 'hour');
-      hourHandRef.current.addEventListener('pointerdown', handler);
-      handlers.push({ element: hourHandRef.current, event: 'pointerdown', handler });
-      hourHandRef.current.style.cursor = 'grab';
-      hourHandRef.current.style.touchAction = 'none';
+    // 为热区添加事件监听
+    if (allowHour && hourHandGroupRef.current) {
+      const hitArea = hourHandGroupRef.current.querySelector('.hand-hit-area');
+      if (hitArea) {
+        const handler = (e: Event) => handlePointerDown(e as PointerEvent, 'hour');
+        hitArea.addEventListener('pointerdown', handler);
+        handlers.push({ element: hitArea, event: 'pointerdown', handler });
+      }
     }
 
-    if (allowMinute && minuteHandRef.current) {
-      const handler = (e: Event) => handlePointerDown(e as PointerEvent, 'minute');
-      minuteHandRef.current.addEventListener('pointerdown', handler);
-      handlers.push({ element: minuteHandRef.current, event: 'pointerdown', handler });
-      minuteHandRef.current.style.cursor = 'grab';
-      minuteHandRef.current.style.touchAction = 'none';
+    if (allowMinute && minuteHandGroupRef.current) {
+      const hitArea = minuteHandGroupRef.current.querySelector('.hand-hit-area');
+      if (hitArea) {
+        const handler = (e: Event) => handlePointerDown(e as PointerEvent, 'minute');
+        hitArea.addEventListener('pointerdown', handler);
+        handlers.push({ element: hitArea, event: 'pointerdown', handler });
+      }
     }
 
     window.addEventListener('pointermove', handlePointerMove);
@@ -305,18 +281,16 @@ export function AnalogClock({
     };
   }, [draggable, draggableHands, getAngleFromCenter, snapAngle, getHandRotation, setHandRotation, onTimeChange]);
 
-  // 生成小时刻度和数字
+  // 生成刻度和数字
   const hourMarks = Array.from({ length: 12 }, (_, i) => {
     const angle = (i * 30 - 90) * (Math.PI / 180);
     const x1 = center + (radius - 15) * Math.cos(angle);
     const y1 = center + (radius - 15) * Math.sin(angle);
     const x2 = center + radius * Math.cos(angle);
     const y2 = center + radius * Math.sin(angle);
-
     return { x1, y1, x2, y2, hour: i === 0 ? 12 : i };
   });
 
-  // 生成分钟刻度
   const minuteMarks = Array.from({ length: 60 }, (_, i) => {
     if (i % 5 === 0) return null;
     const angle = (i * 6 - 90) * (Math.PI / 180);
@@ -324,29 +298,27 @@ export function AnalogClock({
     const y1 = center + (radius - 8) * Math.sin(angle);
     const x2 = center + radius * Math.cos(angle);
     const y2 = center + radius * Math.sin(angle);
-
     return { x1, y1, x2, y2 };
   }).filter(Boolean) as { x1: number; y1: number; x2: number; y2: number }[];
 
-  // 生成小时数字位置
   const hourNumbers = Array.from({ length: 12 }, (_, i) => {
     const hour = i === 0 ? 12 : i;
     const angle = (i * 30 - 90) * (Math.PI / 180);
     const x = center + (radius - 35) * Math.cos(angle);
     const y = center + (radius - 35) * Math.sin(angle);
-
     return { x, y, hour };
   });
 
-  // 指针长度
   const hourHandLength = radius * 0.5;
   const minuteHandLength = radius * 0.7;
   const secondHandLength = radius * 0.85;
 
-  // 弱化其它指针
   const shouldFocus = focusOnHighlightedHand && highlightHand != null;
   const handOpacity = (hand: 'hour' | 'minute' | 'second') =>
     shouldFocus && highlightHand !== hand ? 0.2 : 1;
+
+  // 触摸热区半径（手机上需要更大的触摸区域）
+  const hitAreaRadius = Math.max(40, size / 7);
 
   return (
     <div className="flex justify-center items-center">
@@ -361,10 +333,21 @@ export function AnalogClock({
       >
         {/* CSS样式定义 */}
         <style>{`
-          .hour-hand, .minute-hand, .second-hand {
+          .hand-line {
             will-change: transform;
           }
           
+          .hand-hit-area {
+            cursor: grab;
+            fill: transparent;
+            stroke: transparent;
+            touch-action: none;
+          }
+          
+          .hand-hit-area:active {
+            cursor: grabbing;
+          }
+
           .dragging {
             stroke-width: 14 !important;
             filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.6));
@@ -488,44 +471,62 @@ export function AnalogClock({
             </text>
           ))}
 
-        {/* 时针 - 直接使用 line 元素，设置更大的点击区域 */}
-        <line
-          ref={hourHandRef}
-          className={`hour-hand ${draggable && (draggableHands?.hour ?? true) ? 'cursor-grab' : ''}`}
-          x1={center}
-          y1={center}
-          x2={center}
-          y2={center - hourHandLength}
-          stroke={COLORS.HOUR_HAND}
-          strokeWidth={draggable && (draggableHands?.hour ?? true) ? 12 : 10}
-          strokeLinecap="round"
-          opacity={handOpacity('hour')}
-          style={{ 
-            pointerEvents: draggable && (draggableHands?.hour ?? true) ? 'all' : 'none'
-          }}
-        />
+        {/* 时针组 - 包含指针和触摸热区 */}
+        <g ref={hourHandGroupRef} opacity={handOpacity('hour')}>
+          {/* 指针本体 */}
+          <line
+            className="hand-line"
+            x1={center}
+            y1={center}
+            x2={center}
+            y2={center - hourHandLength}
+            stroke={COLORS.HOUR_HAND}
+            strokeWidth={10}
+            strokeLinecap="round"
+            style={{ pointerEvents: 'none' }}
+          />
+          {/* 触摸热区 - 大的透明圆形，覆盖指针区域 */}
+          {draggable && (draggableHands?.hour ?? true) && (
+            <circle
+              className="hand-hit-area"
+              cx={center}
+              cy={center - hourHandLength / 2}
+              r={hitAreaRadius}
+              style={{ pointerEvents: 'all' }}
+            />
+          )}
+        </g>
 
-        {/* 分针 */}
-        <line
-          ref={minuteHandRef}
-          className={`minute-hand ${draggable && (draggableHands?.minute ?? true) ? 'cursor-grab' : ''}`}
-          x1={center}
-          y1={center}
-          x2={center}
-          y2={center - minuteHandLength}
-          stroke={COLORS.MINUTE_HAND}
-          strokeWidth={draggable && (draggableHands?.minute ?? true) ? 8 : 6}
-          strokeLinecap="round"
-          opacity={handOpacity('minute')}
-          style={{ 
-            pointerEvents: draggable && (draggableHands?.minute ?? true) ? 'all' : 'none'
-          }}
-        />
+        {/* 分针组 */}
+        <g ref={minuteHandGroupRef} opacity={handOpacity('minute')}>
+          {/* 指针本体 */}
+          <line
+            className="hand-line"
+            x1={center}
+            y1={center}
+            x2={center}
+            y2={center - minuteHandLength}
+            stroke={COLORS.MINUTE_HAND}
+            strokeWidth={6}
+            strokeLinecap="round"
+            style={{ pointerEvents: 'none' }}
+          />
+          {/* 触摸热区 */}
+          {draggable && (draggableHands?.minute ?? true) && (
+            <circle
+              className="hand-hit-area"
+              cx={center}
+              cy={center - minuteHandLength / 2}
+              r={hitAreaRadius}
+              style={{ pointerEvents: 'all' }}
+            />
+          )}
+        </g>
 
         {/* 秒针 */}
         <line
           ref={secondHandRef}
-          className="second-hand"
+          className="hand-line"
           x1={center}
           y1={center + 15}
           x2={center}

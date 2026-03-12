@@ -115,6 +115,20 @@ export function LearnTimePage() {
   const [clickCount, setClickCount] = useState(0);
   const { playSound } = useAudio();
   
+  // 图片预加载状态
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  
+  // 预加载所有时钟种类图片
+  useEffect(() => {
+    clockHistory.forEach((item) => {
+      const img = new Image();
+      img.onload = () => {
+        setLoadedImages(prev => new Set(prev).add(item.imageSrc));
+      };
+      img.src = item.imageSrc;
+    });
+  }, []);
+  
   // 眨眼动画
   const [isBlinking, setIsBlinking] = useState(false);
   
@@ -893,13 +907,20 @@ export function LearnTimePage() {
                         transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
                       >
                         <StickerFrame>
-                          <img
-                            src={clockHistory[historyIndex].imageSrc}
-                            alt={clockHistory[historyIndex].imageAlt}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-44 h-32 object-contain rounded-2xl"
-                          />
+                          <div className="w-44 h-32 flex items-center justify-center">
+                            {loadedImages.has(clockHistory[historyIndex].imageSrc) ? (
+                              <img
+                                src={clockHistory[historyIndex].imageSrc}
+                                alt={clockHistory[historyIndex].imageAlt}
+                                className="w-44 h-32 object-contain rounded-2xl"
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center text-base-content/40">
+                                <div className="loading loading-spinner loading-lg text-primary"></div>
+                                <span className="text-xs mt-2">加载中...</span>
+                              </div>
+                            )}
+                          </div>
                         </StickerFrame>
                       </motion.div>
                     </div>
