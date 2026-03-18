@@ -39,7 +39,7 @@ export function DigitalClockPage() {
   
   return (
     <Layout title="认识数字时钟" showBack showFooter={false}>
-      <div className="flex flex-col items-center gap-6 py-4 relative overflow-hidden">
+      <div className="flex flex-col items-center gap-3 sm:gap-6 py-2 sm:py-4 relative overflow-hidden">
         {/* 背景装饰 */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {/* 网格背景 */}
@@ -82,11 +82,11 @@ export function DigitalClockPage() {
           className="relative text-center z-10"
         >
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 
-            text-white rounded-full px-4 py-1.5 shadow-lg shadow-indigo-500/30 mb-3">
-            <span className="text-xl">⌚</span>
+            text-white rounded-full px-3 sm:px-4 py-1 sm:py-1.5 shadow-lg shadow-indigo-500/30 mb-2 sm:mb-3">
+            <span className="text-lg sm:text-xl">⌚</span>
             <span className="font-display">数字时钟</span>
           </div>
-          <p className="text-base-content/70 text-sm">
+          <p className="text-base-content/70 text-xs sm:text-sm">
             数字直接显示时间，一目了然！
           </p>
         </motion.div>
@@ -101,11 +101,11 @@ export function DigitalClockPage() {
           {/* 时钟容器 */}
           <div className="relative">
             {/* 外部装饰环 */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 
+            <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 
               rounded-3xl opacity-20 blur-xl" />
             
             {/* 主卡片 */}
-            <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl shadow-indigo-500/10
+            <div className="relative bg-white/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl shadow-indigo-500/10
               border border-white/50">
               
               {/* 时间格式指示 */}
@@ -118,7 +118,7 @@ export function DigitalClockPage() {
               {/* 数字时钟组件 */}
               <DigitalClock
                 time={time}
-                size="lg"
+                size="sm"
                 editable={!isRealTime}
                 showSeconds
                 format={format}
@@ -130,7 +130,7 @@ export function DigitalClockPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 text-center"
+                  className="mt-2 sm:mt-4 text-center"
                 >
                   <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-700 
                     text-xs font-medium px-3 py-1 rounded-full">
@@ -152,10 +152,10 @@ export function DigitalClockPage() {
               exit={{ opacity: 0, scale: 0.8 }}
               className="relative z-10"
             >
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/50">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50">
                 <AnalogClock
                   time={time}
-                  size={160}
+                  size={130}
                   draggable={false}
                   showNumbers
                   showMinuteMarks={false}
@@ -172,8 +172,8 @@ export function DigitalClockPage() {
           transition={{ delay: 0.3 }}
           className="w-full max-w-sm z-10"
         >
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/50">
-            <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 sm:p-4 shadow-lg border border-white/50">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
                 { value: time.hours.toString().padStart(2, '0'), label: '小时', range: '0-23', color: 'text-indigo-500' },
                 { value: time.minutes.toString().padStart(2, '0'), label: '分钟', range: '0-59', color: 'text-amber-500' },
@@ -184,7 +184,7 @@ export function DigitalClockPage() {
                     key={item.value}
                     initial={{ scale: 1.1 }}
                     animate={{ scale: 1 }}
-                    className={`font-display text-2xl ${item.color}`}
+                    className={`font-display text-xl sm:text-2xl ${item.color}`}
                   >
                     {item.value}
                   </motion.div>
@@ -201,14 +201,14 @@ export function DigitalClockPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="flex flex-wrap gap-3 justify-center z-10"
+          className="flex flex-wrap gap-2 sm:gap-3 justify-center z-10"
         >
           {/* 模式切换 */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleRealTimeToggle}
-            className={`relative overflow-hidden rounded-2xl px-5 py-3 font-display text-sm
+            className={`relative overflow-hidden rounded-xl sm:rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 font-display text-xs sm:text-sm
               ${isRealTime 
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30' 
                 : 'bg-white text-base-content shadow-md border-2 border-dashed border-indigo-300'
@@ -234,7 +234,7 @@ export function DigitalClockPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowAnalogClock(!showAnalogClock)}
-            className="bg-white rounded-2xl px-5 py-3 font-display text-sm text-base-content 
+            className="bg-white rounded-xl sm:rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 font-display text-xs sm:text-sm text-base-content 
               shadow-md border-2 border-dashed border-amber-300"
           >
             <span className="flex items-center gap-2">
@@ -257,7 +257,7 @@ export function DigitalClockPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setFormat(format === '12h' ? '24h' : '12h')}
-            className="bg-white rounded-2xl px-5 py-3 font-display text-sm text-base-content 
+            className="bg-white rounded-xl sm:rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 font-display text-xs sm:text-sm text-base-content 
               shadow-md border-2 border-dashed border-emerald-300"
           >
             <span className="flex items-center gap-2">

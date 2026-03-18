@@ -13,6 +13,28 @@ import { useAudio } from '@/hooks';
 
 type GameStage = 'select' | 'playing' | 'result';
 
+type ConfettiParticle = {
+  id: number;
+  x: string;
+  rotate: number;
+  duration: number;
+  delay: number;
+  icon: string;
+};
+
+const confettiIcons = ['⭐', '🎉', '✨', '🌟'] as const;
+
+const createConfettiParticles = (count: number): ConfettiParticle[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: `${Math.round((i / count) * 100)}%`,
+    rotate: (i * 47) % 360,
+    duration: 3 + (i % 5) * 0.4,
+    delay: (i % 6) * 0.08,
+    icon: confettiIcons[i % confettiIcons.length],
+  }));
+};
+
 // 难度配置
 const difficultyConfig = [
   { key: 'beginner' as DifficultyLevel, emoji: '🌱', color: 'from-emerald-400 to-teal-500', shadow: 'shadow-emerald-500/30' },
@@ -40,6 +62,8 @@ export function PracticePage() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [userTimeInput, setUserTimeInput] = useState<ClockTime>({ hours: 0, minutes: 0, seconds: 0 });
   
+  const confettiParticles = createConfettiParticles(20);
+
   // 结果页面音效播放（必须在组件顶层）
   useEffect(() => {
     if (stage === 'result' && session) {
@@ -113,7 +137,7 @@ export function PracticePage() {
   if (stage === 'select') {
     return (
       <Layout title="游戏练习" showBack showFooter={false}>
-        <div className="flex flex-col items-center gap-6 py-6 relative overflow-hidden">
+        <div className="flex flex-col items-center gap-4 sm:gap-6 py-3 sm:py-6 relative overflow-hidden">
           {/* 背景装饰 */}
           <div className="absolute inset-0 pointer-events-none">
             <motion.div
@@ -145,13 +169,13 @@ export function PracticePage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center relative z-10"
           >
-            <div className="text-5xl mb-3">🎮</div>
-            <h2 className="font-display text-3xl text-gradient mb-2">游戏练习</h2>
-            <p className="text-base-content/70">选择难度，开始挑战吧！</p>
+            <div className="text-4xl sm:text-5xl mb-2 sm:mb-3">🎮</div>
+            <h2 className="font-display text-2xl sm:text-3xl text-gradient mb-1.5 sm:mb-2">游戏练习</h2>
+            <p className="text-sm sm:text-base text-base-content/70">选择难度，开始挑战吧！</p>
           </motion.div>
           
           {/* 难度选择卡片 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg relative z-10">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-lg relative z-10">
             {difficultyConfig.map((diff, index) => {
               const config = DIFFICULTY_CONFIG[diff.key];
               return (
@@ -163,7 +187,7 @@ export function PracticePage() {
                   whileHover={{ scale: 1.02, y: -4 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleStartGame(diff.key)}
-                  className={`relative overflow-hidden bg-white rounded-2xl p-5 text-left
+                  className={`relative overflow-hidden bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-5 text-left
                     shadow-lg ${diff.shadow} group`}
                 >
                   {/* 背景渐变 */}
@@ -172,10 +196,10 @@ export function PracticePage() {
                   
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-3xl">{diff.emoji}</span>
-                      <h3 className="font-display text-xl text-base-content">{config.name}</h3>
+                      <span className="text-2xl sm:text-3xl">{diff.emoji}</span>
+                      <h3 className="font-display text-base sm:text-xl text-base-content">{config.name}</h3>
                     </div>
-                    <p className="text-sm text-base-content/60 mb-3">{config.description}</p>
+                    <p className="hidden sm:block text-sm text-base-content/60 mb-3">{config.description}</p>
                     <div className="flex items-center gap-2 text-xs text-base-content/50">
                       <Target className="w-4 h-4" />
                       <span>{config.questionCount} 道题目</span>
@@ -224,33 +248,33 @@ export function PracticePage() {
     
     return (
       <Layout title="练习完成" showBack showFooter={false}>
-        <div className="flex flex-col items-center gap-6 py-6 relative overflow-hidden">
+        <div className="flex flex-col items-center gap-4 sm:gap-6 py-3 sm:py-6 relative overflow-hidden">
           {/* 庆祝效果 */}
           {accuracy >= 70 && (
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {[...Array(20)].map((_, i) => (
+              {confettiParticles.map((particle) => (
                 <motion.div
-                  key={i}
+                  key={particle.id}
                   initial={{ 
                     y: -20,
-                    x: Math.random() * 100 + '%',
+                    x: particle.x,
                     opacity: 1,
                     rotate: 0
                   }}
                   animate={{ 
                     y: '100vh',
                     opacity: [1, 1, 0],
-                    rotate: Math.random() * 360
+                    rotate: particle.rotate
                   }}
                   transition={{ 
-                    duration: 3 + Math.random() * 2,
-                    delay: Math.random() * 0.5,
+                    duration: particle.duration,
+                    delay: particle.delay,
                     repeat: Infinity,
                     repeatDelay: 1
                   }}
                   className="absolute text-2xl"
                 >
-                  {['⭐', '🎉', '✨', '🌟'][Math.floor(Math.random() * 4)]}
+                  {particle.icon}
                 </motion.div>
               ))}
             </div>
@@ -263,7 +287,7 @@ export function PracticePage() {
             transition={{ type: 'spring', stiffness: 200 }}
             className="relative z-10"
           >
-            <div className="text-6xl mb-4">
+            <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">
               {accuracy >= 80 ? '🏆' : accuracy >= 60 ? '⭐' : '💪'}
             </div>
           </motion.div>
@@ -273,12 +297,12 @@ export function PracticePage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center relative z-10"
           >
-            <h2 className="font-display text-3xl text-gradient mb-3">
+            <h2 className="font-display text-2xl sm:text-3xl text-gradient mb-2 sm:mb-3">
               {randomChoice(ENCOURAGEMENTS.complete)}
             </h2>
             
             {/* 星星评价 */}
-            <div className="flex justify-center gap-2 mb-4">
+            <div className="flex justify-center gap-1.5 sm:gap-2 mb-3 sm:mb-4">
               {[...Array(3)].map((_, i) => (
                 <motion.div
                   key={i}
@@ -287,7 +311,7 @@ export function PracticePage() {
                   transition={{ delay: 0.3 + i * 0.1, type: 'spring' }}
                 >
                   <Star
-                    className={`w-8 h-8 ${
+                    className={`w-7 h-7 sm:w-8 sm:h-8 ${
                       i < stars ? 'text-amber-400 fill-amber-400' : 'text-gray-300'
                     }`}
                   />
@@ -303,7 +327,7 @@ export function PracticePage() {
             transition={{ delay: 0.3 }}
             className="w-full max-w-sm relative z-10"
           >
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-lg">
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { label: '正确', value: session.correctAnswers, color: 'text-emerald-500', icon: '✓' },
@@ -331,22 +355,22 @@ export function PracticePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="flex gap-4 relative z-10"
+            className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 relative z-10 w-full sm:w-auto"
           >
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleRestart}
-              className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 
-                text-white rounded-2xl px-6 py-3 font-display shadow-lg shadow-indigo-500/30"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 
+                text-white rounded-xl sm:rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 font-display shadow-lg shadow-indigo-500/30"
             >
               <RotateCcw className="w-4 h-4" />
               再来一次
             </motion.button>
             <Link 
               to={ROUTES.HOME}
-              className="flex items-center gap-2 bg-white text-base-content 
-                rounded-2xl px-6 py-3 font-display shadow-md border-2 border-dashed border-indigo-300"
+              className="flex items-center justify-center gap-2 bg-white text-base-content 
+                rounded-xl sm:rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 font-display shadow-md border-2 border-dashed border-indigo-300"
             >
               返回首页
             </Link>
@@ -361,7 +385,7 @@ export function PracticePage() {
   
   return (
     <Layout title="游戏练习" showBack showFooter={false}>
-      <div className="flex flex-col items-center gap-4 py-4 relative">
+      <div className="flex flex-col items-center gap-3 sm:gap-4 py-2 sm:py-4 relative">
         {/* 进度条 */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -395,7 +419,7 @@ export function PracticePage() {
             className="w-full max-w-sm"
           >
             {/* 题目卡片 */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-lg mb-4">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-lg mb-3 sm:mb-4">
               <div className="text-center mb-4">
                 <span className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 
                   text-sm font-display px-3 py-1 rounded-full">
@@ -409,7 +433,7 @@ export function PracticePage() {
                 {currentQuestion.type === 'analog-to-digital' ? (
                   <AnalogClock
                     time={currentQuestion.time}
-                    size={240}
+                    size={190}
                     draggable={false}
                     showNumbers
                     showMinuteMarks={false}
@@ -439,7 +463,7 @@ export function PracticePage() {
             
             {/* 选项区域 */}
             {currentQuestion.type !== 'manual-input' && currentQuestion.options && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
                 {currentQuestion.options.map((option, index) => (
                   <motion.button
                     key={index}
@@ -451,7 +475,7 @@ export function PracticePage() {
                     }}
                     disabled={showFeedback}
                     className={`relative overflow-hidden rounded-xl p-4
-                      transition-all duration-200 min-h-[140px] flex items-center justify-center
+                      transition-all duration-200 min-h-[112px] sm:min-h-[140px] flex items-center justify-center
                       ${selectedAnswer === option
                         ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg'
                         : 'bg-white text-base-content shadow-md hover:shadow-lg'
@@ -472,7 +496,7 @@ export function PracticePage() {
                     {currentQuestion.type === 'digital-to-analog' && (
                       <AnalogClock
                         time={option}
-                        size={140}
+                        size={112}
                         draggable={false}
                         showNumbers={false}
                         showMinuteMarks={false}
@@ -499,7 +523,7 @@ export function PracticePage() {
               <AnalogClockTutorial
                 value={userTimeInput}
                 onChange={setUserTimeInput}
-                clockSize={200}
+                clockSize={176}
                 showPracticeClockAfterDone
               />
             )}
@@ -513,7 +537,7 @@ export function PracticePage() {
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.9 }}
-              className={`w-full max-w-sm p-4 rounded-2xl shadow-lg ${
+              className={`w-full max-w-sm p-3 sm:p-4 rounded-2xl shadow-lg ${
                 isCorrect 
                   ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' 
                   : 'bg-gradient-to-r from-rose-500 to-pink-500 text-white'
@@ -539,15 +563,15 @@ export function PracticePage() {
         </AnimatePresence>
         
         {/* 操作按钮 */}
-        <div className="flex gap-4">
+        <div className="flex gap-2.5 sm:gap-4 w-full sm:w-auto">
           {!showFeedback ? (
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSubmitAnswer}
               disabled={!selectedAnswer && currentQuestion.type !== 'manual-input'}
-              className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 
-                text-white rounded-2xl px-8 py-4 font-display text-lg shadow-lg shadow-indigo-500/30
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 
+                text-white rounded-xl sm:rounded-2xl px-5 sm:px-8 py-3 sm:py-4 font-display text-base sm:text-lg shadow-lg shadow-indigo-500/30
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               提交答案
@@ -557,8 +581,8 @@ export function PracticePage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleNextQuestion}
-              className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 
-                text-white rounded-2xl px-8 py-4 font-display text-lg shadow-lg shadow-indigo-500/30"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 
+                text-white rounded-xl sm:rounded-2xl px-5 sm:px-8 py-3 sm:py-4 font-display text-base sm:text-lg shadow-lg shadow-indigo-500/30"
             >
               {session.currentQuestionIndex < session.totalQuestions - 1 ? (
                 <>

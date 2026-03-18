@@ -25,8 +25,8 @@ export function Footer() {
       {/* 背景模糊效果 */}
       <div className="absolute inset-0 bg-white/80 backdrop-blur-md border-t border-white/50" />
       
-      <nav className="relative container mx-auto px-2">
-        <ul className="flex justify-around items-center h-16">
+      <nav className="relative container mx-auto px-1.5 sm:px-2">
+        <ul className="flex justify-around items-center h-14 sm:h-16">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             
@@ -34,7 +34,7 @@ export function Footer() {
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className="relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-colors"
+                  className="relative flex flex-col items-center gap-0.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl transition-colors"
                 >
                   {isActive && (
                     <motion.div
@@ -59,12 +59,12 @@ export function Footer() {
                     {isActive ? (
                       <span className="text-xl">{item.emoji}</span>
                     ) : (
-                      item.icon
+                      <span className="scale-90 sm:scale-100">{item.icon}</span>
                     )}
                   </motion.div>
                   
                   <motion.span 
-                    className={`relative z-10 text-xs font-medium ${
+                    className={`relative z-10 text-[11px] sm:text-xs font-medium ${
                       isActive 
                         ? 'text-primary font-display' 
                         : 'text-base-content/50'

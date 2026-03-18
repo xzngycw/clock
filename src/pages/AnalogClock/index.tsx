@@ -54,7 +54,7 @@ export function AnalogClockPage() {
   
   return (
     <Layout title="认识模拟时钟" showBack showFooter={false}>
-      <div className="flex flex-col items-center gap-6 py-4 relative">
+      <div className="flex flex-col items-center gap-3 sm:gap-6 py-2 sm:py-4 relative">
         {/* 装饰性背景 */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -73,14 +73,14 @@ export function AnalogClockPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative text-center max-w-md px-4"
+          className="relative text-center max-w-md px-3 sm:px-4"
         >
           <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full 
-            px-4 py-2 shadow-lg mb-3">
-            <span className="text-2xl">🕐</span>
-            <span className="font-display text-lg text-gradient">模拟时钟</span>
+            px-3 sm:px-4 py-1.5 sm:py-2 shadow-lg mb-2 sm:mb-3">
+            <span className="text-xl sm:text-2xl">🕐</span>
+            <span className="font-display text-base sm:text-lg text-gradient">模拟时钟</span>
           </div>
-          <p className="text-base-content/70 text-sm leading-relaxed">
+          <p className="text-base-content/70 text-xs sm:text-sm leading-relaxed">
             模拟时钟有三个指针，<br />
             让我们一起来认识它们吧！
           </p>
@@ -110,10 +110,10 @@ export function AnalogClockPage() {
             rounded-full blur-2xl scale-110" />
           
           {/* 时钟卡片 */}
-          <div className="relative bg-white rounded-3xl p-6 shadow-xl shadow-indigo-500/10">
+          <div className="relative bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 shadow-xl shadow-indigo-500/10">
             <AnalogClock
               time={time}
-              size={280}
+              size={220}
               draggable={!isRealTime}
               showNumbers
               showMinuteMarks
@@ -145,7 +145,7 @@ export function AnalogClockPage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="relative"
             >
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 sm:py-4 shadow-lg">
                 <DigitalClock time={time} size="md" format="12h" />
               </div>
             </motion.div>
@@ -159,7 +159,7 @@ export function AnalogClockPage() {
           transition={{ delay: 0.3 }}
           className="w-full max-w-sm"
         >
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 sm:p-4 shadow-lg">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTip}
@@ -195,7 +195,7 @@ export function AnalogClockPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-3 gap-3 w-full max-w-sm"
+          className="grid grid-cols-3 gap-2 sm:gap-3 w-full max-w-sm"
         >
           {[
             { label: '时针', desc: '短针', color: 'bg-gray-800', width: 'w-2 h-10' },
@@ -207,7 +207,7 @@ export function AnalogClockPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 + i * 0.1 }}
-              className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center shadow-md"
+              className="bg-white/80 backdrop-blur-sm rounded-xl p-2.5 sm:p-3 text-center shadow-md"
             >
               <div className="flex justify-center mb-2">
                 <div className={`${hand.width} ${hand.color} rounded-full`} />
@@ -223,13 +223,13 @@ export function AnalogClockPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="flex flex-wrap gap-3 justify-center"
+          className="flex flex-wrap gap-2 sm:gap-3 justify-center"
         >
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleRealTimeToggle}
-            className={`relative overflow-hidden rounded-2xl px-5 py-3 font-display text-sm
+            className={`relative overflow-hidden rounded-xl sm:rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 font-display text-xs sm:text-sm
               ${isRealTime 
                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30' 
                 : 'bg-white text-base-content shadow-md border-2 border-dashed border-indigo-300'
@@ -252,7 +252,7 @@ export function AnalogClockPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowDigitalClock(!showDigitalClock)}
-            className="bg-white rounded-2xl px-5 py-3 font-display text-sm text-base-content 
+            className="bg-white rounded-xl sm:rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 font-display text-xs sm:text-sm text-base-content 
               shadow-md border-2 border-dashed border-amber-300"
           >
             {showDigitalClock ? (

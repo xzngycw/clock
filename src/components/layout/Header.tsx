@@ -43,8 +43,8 @@ export function Header({
   
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-white/70 border-b border-white/50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-14">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="flex items-center justify-between h-12 sm:h-14">
           {/* 左侧 - 返回按钮或 Logo */}
           <div className="flex items-center gap-2">
             {showBack ? (
@@ -52,7 +52,7 @@ export function Header({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleBack}
-                className="flex items-center justify-center w-10 h-10 rounded-xl 
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl 
                   bg-white/80 shadow-sm border border-white/50
                   text-base-content/70 hover:text-primary hover:bg-primary/5
                   transition-colors"
@@ -113,7 +113,7 @@ export function Header({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleThemeToggle}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl 
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl 
                 bg-white/80 shadow-sm border border-white/50
                 hover:bg-primary/5 transition-colors ${themeConfig[theme].color}`}
               aria-label="切换主题"

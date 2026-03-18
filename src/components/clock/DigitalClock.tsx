@@ -21,16 +21,16 @@ const sizeConfig = {
     button: 'w-8 h-6',
   },
   md: {
-    container: 'text-3xl',
-    digit: 'w-12 h-14',
-    separator: 'text-2xl',
-    button: 'w-10 h-8',
+    container: 'text-2xl sm:text-3xl',
+    digit: 'w-10 h-12 sm:w-12 sm:h-14',
+    separator: 'text-xl sm:text-2xl',
+    button: 'w-9 h-7 sm:w-10 sm:h-8',
   },
   lg: {
-    container: 'text-5xl',
-    digit: 'w-16 h-20',
-    separator: 'text-4xl',
-    button: 'w-14 h-10',
+    container: 'text-3xl sm:text-5xl',
+    digit: 'w-12 h-14 sm:w-16 sm:h-20',
+    separator: 'text-2xl sm:text-4xl',
+    button: 'w-10 h-8 sm:w-14 sm:h-10',
   },
 };
 
@@ -126,8 +126,8 @@ export function DigitalClock({
   );
   
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className={`inline-flex items-center gap-2 ${config.container}`}>
+    <div className="flex flex-col items-center gap-2 sm:gap-4">
+      <div className={`inline-flex items-center gap-1.5 sm:gap-2 ${config.container}`}>
         {editable ? (
           <>
             <EditableDigit type="hours" value={hours} />

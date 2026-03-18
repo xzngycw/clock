@@ -58,7 +58,7 @@ export function Layout({
           showThemeToggle={showThemeToggle}
         />
         
-        <main className={`flex-1 container mx-auto px-4 py-4 ${showFooter ? 'pb-20' : ''}`}>
+        <main className={`flex-1 container mx-auto px-3 sm:px-4 py-2 sm:py-4 ${showFooter ? 'pb-16 sm:pb-20' : ''}`}>
           {children}
         </main>
         

@@ -89,7 +89,7 @@ const cardVariants = {
 export function HomePage() {
   return (
     <Layout showBack={false} showFooter={true}>
-      <div className="relative flex flex-col items-center gap-8 py-6 overflow-hidden">
+      <div className="relative flex flex-col items-center gap-4 sm:gap-8 py-3 sm:py-6 overflow-hidden">
         {/* 装饰性背景元素 */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* 浮动的时钟图标 */}
@@ -99,7 +99,7 @@ export function HomePage() {
               custom={i}
               variants={floatVariants}
               animate="animate"
-              className="absolute text-3xl opacity-20"
+              className="absolute text-2xl sm:text-3xl opacity-20"
               style={{
                 left: `${10 + i * 15}%`,
                 top: `${5 + (i % 3) * 25}%`,
@@ -126,16 +126,16 @@ export function HomePage() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="inline-block mb-4"
+            className="inline-block mb-2 sm:mb-4"
           >
-            <span className="text-6xl sm:text-7xl block mb-2">⏰</span>
+            <span className="text-5xl sm:text-7xl block mb-1 sm:mb-2">⏰</span>
           </motion.div>
           
           <motion.h1
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="font-display text-4xl sm:text-5xl mb-3"
+            className="font-display text-3xl sm:text-5xl mb-2 sm:mb-3"
           >
             <span className="text-gradient">认识时间</span>
           </motion.h1>
@@ -144,16 +144,16 @@ export function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-lg text-base-content/70 flex items-center justify-center gap-2"
+            className="text-sm sm:text-lg text-base-content/70 flex items-center justify-center gap-2"
           >
-            <Sparkles className="w-5 h-5 text-amber-500" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
             让我们一起学习认识时间吧！
-            <Sparkles className="w-5 h-5 text-amber-500" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
           </motion.p>
         </motion.div>
 
         {/* 功能卡片区域 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 w-full max-w-2xl relative z-10">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 w-full max-w-2xl relative z-10">
           {features.map((feature, index) => (
             <motion.div
               key={feature.path}
@@ -165,7 +165,7 @@ export function HomePage() {
             >
               <Link
                 to={feature.path}
-                className={`group relative block bg-white rounded-3xl p-5 overflow-hidden
+                className={`group relative block bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 overflow-hidden
                   shadow-lg ${feature.shadowColor} hover:shadow-xl transition-shadow duration-300`}
               >
                 {/* 卡片背景渐变 */}
@@ -175,7 +175,7 @@ export function HomePage() {
                 {/* 内容 */}
                 <div className="relative flex items-start gap-4">
                   {/* 图标区域 */}
-                  <div className={`relative flex-shrink-0 w-14 h-14 rounded-2xl 
+                  <div className={`relative flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl 
                     bg-gradient-to-br ${feature.gradient} 
                     flex items-center justify-center text-white
                     shadow-lg transform group-hover:scale-110 group-hover:rotate-3 
@@ -190,13 +190,13 @@ export function HomePage() {
                   {/* 文字区域 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{feature.emoji}</span>
-                      <h3 className="font-display text-xl text-base-content group-hover:text-primary 
+                      <span className="text-base sm:text-xl">{feature.emoji}</span>
+                      <h3 className="font-display text-base sm:text-xl text-base-content group-hover:text-primary 
                         transition-colors">
                         {feature.title}
                       </h3>
                     </div>
-                    <p className="text-sm text-base-content/60 mt-1">
+                    <p className="hidden sm:block text-sm text-base-content/60 mt-1">
                       {feature.description}
                     </p>
                   </div>
@@ -206,7 +206,7 @@ export function HomePage() {
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 
                   opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 
                   transition-all duration-300">
-                  <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${feature.gradient} 
+                  <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br ${feature.gradient} 
                     flex items-center justify-center text-white text-sm`}>
                     →
                   </div>
@@ -221,7 +221,7 @@ export function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="relative z-10 flex items-center gap-2 text-base-content/50 text-sm"
+          className="relative z-10 flex items-center gap-1.5 sm:gap-2 text-base-content/50 text-xs sm:text-sm"
         >
           <span className="animate-bounce">👆</span>
           点击卡片开始学习

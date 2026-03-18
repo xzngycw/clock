@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, SkipForward, ArrowRight, Hand, Sparkles, CheckCircle2 } from 'lucide-react';
 import type { ClockTime } from '@/types';
@@ -47,8 +47,8 @@ export function AnalogClockTutorial({
 }: AnalogClockTutorialProps) {
   const { playSound } = useAudio();
 
-  const [mode, setMode] = useState<TutorialMode>('idle');
-  const [demoStep, setDemoStep] = useState<DemoStep>('intro');
+  const [mode, setMode] = useState<TutorialMode>(autoStart ? 'demo' : 'idle');
+  const [demoStep, setDemoStep] = useState<DemoStep>(autoStart ? 'intro' : 'intro');
   const [interactiveStep, setInteractiveStep] = useState<InteractiveStep>('hourTo3');
 
   // 教程用的“目标时间”
@@ -60,13 +60,6 @@ export function AnalogClockTutorial({
     }),
     [],
   );
-
-  useEffect(() => {
-    if (autoStart) {
-      setMode('demo');
-      setDemoStep('intro');
-    }
-  }, [autoStart]);
 
   const demoContent: Record<DemoStep, { title: string; desc: string; highlight: 'hour' | 'minute' | 'second' | null } > = {
     intro: {
@@ -152,12 +145,12 @@ export function AnalogClockTutorial({
     setInteractiveStep('hourTo3');
   };
 
-  const finishTutorial = () => {
+  const finishTutorial = useCallback(() => {
     playSound('success');
     miniCelebration();
     setMode('done');
     onFinish?.();
-  };
+  }, [onFinish, playSound]);
 
   const nextDemo = () => {
     playSound('click');
@@ -207,7 +200,7 @@ export function AnalogClockTutorial({
         }
       }, 500);
     }
-  }, [mode, interactiveStep, interactiveMeta, value, playSound]);
+  }, [mode, interactiveStep, interactiveMeta, value, playSound, finishTutorial]);
 
   const renderOverlay = () => {
     if (mode === 'idle') {

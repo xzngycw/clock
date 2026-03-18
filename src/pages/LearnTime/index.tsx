@@ -723,7 +723,7 @@ export function LearnTimePage() {
   
   return (
     <Layout title="认识时间" showBack showFooter={false}>
-      <div className="flex flex-col items-center gap-6 py-4">
+      <div className="flex flex-col items-center gap-3 sm:gap-6 py-2 sm:py-4">
         <AnimatePresence mode="wait">
           {!showClockTypes ? (
             <motion.div
@@ -731,13 +731,13 @@ export function LearnTimePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="w-full max-w-md"
+              className="w-full max-w-xl"
             >
               {/* 标题 */}
               <motion.div
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
-                className="text-center mb-8"
+                className="text-center mb-4 sm:mb-8"
               >
                 <h2 className="font-display text-2xl text-base-content mb-2">
                   时间是什么？
@@ -754,7 +754,7 @@ export function LearnTimePage() {
                   initial={{ opacity: 0, x: 50 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -50 }}
-                  className="card-fun mb-6 relative overflow-hidden"
+                  className="card-fun mb-4 sm:mb-6 relative overflow-hidden"
                 >
                   {/* 背景装饰 */}
                   <div className="absolute top-0 right-0 text-6xl opacity-10 pointer-events-none">
@@ -789,7 +789,7 @@ export function LearnTimePage() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-base-200 rounded-xl p-6 mb-4"
+                    className="bg-base-200 rounded-xl p-4 sm:p-6 mb-4"
                   >
                     {renderAnimation()}
                   </motion.div>
@@ -844,7 +844,7 @@ export function LearnTimePage() {
               {/* 下一步按钮 */}
               <motion.button
                 onClick={handleNextConcept}
-                className="btn-primary-fun w-full flex items-center justify-center gap-2"
+                className="btn-primary-fun w-full flex items-center justify-center gap-2 py-2.5 sm:py-3"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -866,13 +866,13 @@ export function LearnTimePage() {
               key="clock-types"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="w-full max-w-md"
+              className="w-full max-w-xl"
             >
               {/* 时光机 */}
               <motion.div
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
-                className="text-center mb-8"
+                className="text-center mb-4 sm:mb-8"
               >
                 <h2 className="font-display text-2xl text-base-content mb-2 flex items-center justify-center gap-2">
                   <History className="w-6 h-6 text-primary" />
@@ -884,7 +884,7 @@ export function LearnTimePage() {
               </motion.div>
               
               {/* 时光机卡片展示区 */}
-              <div className="relative mb-8 h-64">
+              <div className="relative mb-6 sm:mb-8 h-56 sm:h-64">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={historyIndex}

@@ -17,7 +17,16 @@ export type SoundType =
  */
 const generateBeep = (frequency: number, duration: number, type: OscillatorType = 'sine'): Promise<void> => {
   return new Promise((resolve) => {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioWindow = window as Window & {
+      webkitAudioContext?: typeof AudioContext;
+    };
+    const AudioContextClass = globalThis.AudioContext ?? audioWindow.webkitAudioContext;
+    if (!AudioContextClass) {
+      resolve();
+      return;
+    }
+
+    const audioContext = new AudioContextClass();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
     
@@ -179,7 +188,8 @@ class AudioManager {
   /**
    * 停止音效（Web Audio API 不需要手动停止）
    */
-  stop(_type: SoundType) {
+  stop(type: SoundType) {
+    void type;
     // Web Audio API 音效会自动停止
     // 但我们可以停止语音
     if ('speechSynthesis' in window) {
