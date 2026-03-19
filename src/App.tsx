@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { PWAPrompts } from '@/components/common/PWAPrompts';
 import {
   AnalogClockPage,
   DigitalClockPage,
@@ -15,6 +16,7 @@ import { ROUTES } from '@/constants';
 function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <PWAPrompts />
       <Routes>
         <Route path={ROUTES.HOME} element={<HomePage />} />
         <Route path={ROUTES.LESSONS} element={<LessonsPage />} />
