@@ -1,14 +1,14 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, CheckCircle, XCircle, ArrowRight, RotateCcw, Star, Sparkles, Target } from 'lucide-react';
 import { Layout } from '@/components/layout';
 import { AnalogClock, DigitalClock } from '@/components/clock';
 import { AnalogClockTutorial } from '@/components/clock/AnalogClockTutorial';
-import { useGameStore, useSettingsStore } from '@/store';
+import { useGameStore, useProgressStore, useSettingsStore } from '@/store';
 import { ClockTimeUtils, randomChoice, celebrateComplete, miniCelebration } from '@/utils';
 import { DIFFICULTY_CONFIG, ENCOURAGEMENTS, ROUTES } from '@/constants';
-import type { ClockTime, DifficultyLevel } from '@/types';
-import { Link } from 'react-router-dom';
+import type { ClockTime, DifficultyLevel, PracticeMode, Question } from '@/types';
+import { Link, useLocation } from 'react-router-dom';
 import { useAudio } from '@/hooks';
 
 type GameStage = 'select' | 'playing' | 'result';
@@ -35,6 +35,18 @@ const createConfettiParticles = (count: number): ConfettiParticle[] => {
   }));
 };
 
+const practiceModes: Array<{
+  key: PracticeMode;
+  title: string;
+  description: string;
+  emoji: string;
+}> = [
+  { key: 'mixed', title: '综合训练', description: '模拟钟和数字钟混合练习', emoji: '🎯' },
+  { key: 'whole-hours', title: '整点专项', description: '只练整点读时', emoji: '🕐' },
+  { key: 'half-hours', title: '半点专项', description: '集中巩固半点', emoji: '🕡' },
+  { key: 'manual-input', title: '动手拨针', description: '手动调整指针到目标时间', emoji: '✋' },
+];
+
 // 难度配置
 const difficultyConfig = [
   { key: 'beginner' as DifficultyLevel, emoji: '🌱', color: 'from-emerald-400 to-teal-500', shadow: 'shadow-emerald-500/30' },
@@ -45,11 +57,15 @@ const difficultyConfig = [
 
 export function PracticePage() {
   const { setDifficulty } = useSettingsStore();
+  const { addPracticeSession, recordWrongAnswer } = useProgressStore();
   const { playSound } = useAudio();
   const { 
     session, 
     currentQuestion, 
-    startSession, 
+    isCustomSession,
+    currentMode,
+    startSession,
+    startCustomSession,
     submitAnswer, 
     nextQuestion, 
     resetSession,
@@ -57,12 +73,17 @@ export function PracticePage() {
   } = useGameStore();
   
   const [stage, setStage] = useState<GameStage>('select');
+  const [selectedMode, setSelectedMode] = useState<PracticeMode>('mixed');
   const [selectedAnswer, setSelectedAnswer] = useState<ClockTime | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [userTimeInput, setUserTimeInput] = useState<ClockTime>({ hours: 0, minutes: 0, seconds: 0 });
+  const location = useLocation();
+  const customSessionInitializedRef = useRef(false);
+  const recordedSessionIdRef = useRef<string | null>(null);
   
   const confettiParticles = createConfettiParticles(20);
+  const customPracticeState = location.state as { mode?: 'wrong-questions'; questions?: Question[] } | null;
 
   // 结果页面音效播放（必须在组件顶层）
   useEffect(() => {
@@ -71,16 +92,34 @@ export function PracticePage() {
       if (accuracy >= 70) {
         playSound('success');
       }
+
+      if (recordedSessionIdRef.current !== session.id) {
+        addPracticeSession(session);
+        recordedSessionIdRef.current = session.id;
+      }
     }
-  }, [stage, session, playSound]);
+  }, [stage, session, playSound, addPracticeSession]);
+
+  useEffect(() => {
+    if (customSessionInitializedRef.current) return;
+    if (stage !== 'select') return;
+    if (customPracticeState?.mode !== 'wrong-questions' || !customPracticeState.questions?.length) return;
+
+    const difficulty = customPracticeState.questions[0]?.difficulty ?? 'junior';
+    startCustomSession(customPracticeState.questions, difficulty);
+    setStage('playing');
+    customSessionInitializedRef.current = true;
+  }, [stage, customPracticeState, startCustomSession]);
   
   // 开始游戏
   const handleStartGame = (diff: DifficultyLevel) => {
     setDifficulty(diff);
-    startSession(diff);
+    startSession(diff, selectedMode);
     setStage('playing');
     setSelectedAnswer(null);
     setShowFeedback(false);
+    recordedSessionIdRef.current = null;
+    customSessionInitializedRef.current = false;
     playSound('transition');
   };
   
@@ -95,6 +134,10 @@ export function PracticePage() {
     if (result) {
       setIsCorrect(result.isCorrect);
       setShowFeedback(true);
+
+      if (!result.isCorrect && currentQuestion) {
+        recordWrongAnswer(currentQuestion, result, 'practice');
+      }
       
       // 播放音效和动画
       if (result.isCorrect) {
@@ -104,7 +147,7 @@ export function PracticePage() {
         playSound('wrong');
       }
     }
-  }, [selectedAnswer, userTimeInput, currentQuestion, submitAnswer, playSound]);
+  }, [selectedAnswer, userTimeInput, currentQuestion, submitAnswer, playSound, recordWrongAnswer]);
   
   // 下一题
   const handleNextQuestion = () => {
@@ -171,8 +214,31 @@ export function PracticePage() {
           >
             <div className="text-4xl sm:text-5xl mb-2 sm:mb-3">🎮</div>
             <h2 className="font-display text-2xl sm:text-3xl text-gradient mb-1.5 sm:mb-2">游戏练习</h2>
-            <p className="text-sm sm:text-base text-base-content/70">选择难度，开始挑战吧！</p>
+            <p className="text-sm sm:text-base text-base-content/70">先选择专项模式，再开始挑战吧！</p>
           </motion.div>
+
+          <div className="grid w-full max-w-3xl gap-3 sm:grid-cols-2 relative z-10">
+            {practiceModes.map((mode) => (
+              <button
+                key={mode.key}
+                type="button"
+                onClick={() => setSelectedMode(mode.key)}
+                className={`rounded-2xl border p-4 text-left shadow-md transition-all ${
+                  selectedMode === mode.key
+                    ? 'border-indigo-400 bg-indigo-50 shadow-indigo-200/60'
+                    : 'border-white/70 bg-white/90'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{mode.emoji}</span>
+                  <div>
+                    <h3 className="font-display text-lg text-base-content">{mode.title}</h3>
+                    <p className="text-sm text-base-content/65">{mode.description}</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
           
           {/* 难度选择卡片 */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full max-w-lg relative z-10">
@@ -298,7 +364,7 @@ export function PracticePage() {
             className="text-center relative z-10"
           >
             <h2 className="font-display text-2xl sm:text-3xl text-gradient mb-2 sm:mb-3">
-              {randomChoice(ENCOURAGEMENTS.complete)}
+              {isCustomSession ? '错题复习完成' : `${practiceModes.find((mode) => mode.key === currentMode)?.title ?? '练习'}完成`}
             </h2>
             
             {/* 星星评价 */}
@@ -368,11 +434,11 @@ export function PracticePage() {
               再来一次
             </motion.button>
             <Link 
-              to={ROUTES.HOME}
+              to={ROUTES.WRONG_QUESTIONS}
               className="flex items-center justify-center gap-2 bg-white text-base-content 
                 rounded-xl sm:rounded-2xl px-5 sm:px-6 py-2.5 sm:py-3 font-display shadow-md border-2 border-dashed border-indigo-300"
             >
-              返回首页
+              查看错题本
             </Link>
           </motion.div>
         </div>
@@ -426,6 +492,11 @@ export function PracticePage() {
                   <Sparkles className="w-4 h-4" />
                   请选择正确的时间
                 </span>
+                {!isCustomSession && (
+                  <p className="mt-3 text-sm text-base-content/60">
+                    当前模式：{practiceModes.find((mode) => mode.key === currentMode)?.title ?? '综合训练'}
+                  </p>
+                )}
               </div>
               
               {/* 显示题目时钟 */}

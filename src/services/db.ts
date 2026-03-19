@@ -248,6 +248,7 @@ export async function initDatabase(): Promise<void> {
         accuracy: 0,
         completedLessons: [],
         practiceHistory: [],
+        wrongQuestions: [],
         achievements: [],
         streakDays: 0,
         longestStreak: 0,

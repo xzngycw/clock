@@ -1,5 +1,9 @@
 export { HomePage } from './Home';
+export { LessonsPage } from './Lessons';
+export { LessonDetailPage } from './LessonDetail';
 export { LearnTimePage } from './LearnTime';
 export { AnalogClockPage } from './AnalogClock';
 export { DigitalClockPage } from './DigitalClock';
 export { PracticePage } from './Practice';
+export { WrongQuestionsPage } from './WrongQuestions';
+export { ParentSummaryPage } from './ParentSummary';

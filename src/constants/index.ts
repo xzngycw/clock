@@ -3,10 +3,14 @@
  */
 export const ROUTES = {
   HOME: '/',
+  LESSONS: '/lessons',
+  LESSON_DETAIL: '/lessons/:lessonId',
   LEARN_TIME: '/learn-time',
   ANALOG_CLOCK: '/analog-clock',
   DIGITAL_CLOCK: '/digital-clock',
   PRACTICE: '/practice',
+  WRONG_QUESTIONS: '/wrong-questions',
+  PARENT_SUMMARY: '/parent-summary',
   SETTINGS: '/settings',
 } as const;
 
@@ -179,3 +183,5 @@ export const DEFAULT_USER_SETTINGS = {
   autoAdvance: false,
   showTimer: true,
 };
+
+export { MVP_LESSONS, getLessonById } from './lessons';
